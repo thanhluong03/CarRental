@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Xe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; }
+        img { 
+            width: 70px;   /* Đặt chiều rộng tối đa */
+            height: 70px;  /* Đặt chiều cao tối đa */
+            object-fit: cover; /* Giữ tỷ lệ ảnh đúng */
+            border-radius: 5px; /* Tạo bo tròn cho ảnh */
+        }
+        input, button { margin: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Quản Lý Xe</h1>
+
+    <h2>Thêm Xe Mới</h2>
+    <button onclick="goToAddCarPage()">Thêm Xe</button>
+
+    <h2>Danh Sách Xe</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Ảnh</th>  <!-- Cột ảnh -->
+                <th>Tên Xe</th>
+                <th>Hãng Xe</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="carList"></tbody>
+    </table>
+
+    <script>
+        const apiUrl = "http://localhost:8080/cars/listcar";  // API lấy danh sách xe
+
+        // Hàm lấy và hiển thị danh sách xe
+        async function fetchCars() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Lỗi khi lấy danh sách xe");
+                const cars = await response.json();
+                const tableBody = document.getElementById("carList");
+                tableBody.innerHTML = "";
+                
+                // Thêm số thứ tự tăng dần vào danh sách xe
+                cars.forEach((car, index) => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td> <!-- Hiển thị số thứ tự -->
+                            <td><img src="data:image/jpeg;base64,${car.image}" alt="Ảnh xe"></td>  <!-- Hiển thị ảnh xe -->
+                            <td>${car.name}</td>
+                            <td>${car.brand}</td>
+                            <td>
+                                <button onclick="editCar(${car.id})">Sửa</button>
+                                <button onclick="deleteCar(${car.id})">Xóa</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu xe:", error);
+            }
+        }
+
+        // Hàm điều hướng đến trang thêm xe (add.html)
+        function goToAddCarPage() {
+            window.location.href = "add";  // Giả sử bạn có trang 'add.html' cho việc thêm xe mới
+        }
+
+        // Hàm sửa xe (redirect to edit page)
+        function editCar(id) {
+            window.location.href = `updatecar?id=${id}`;
+        }
+
+        // Hàm xóa xe
+        async function deleteCar(id) {
+            if (confirm("Bạn có chắc chắn muốn xóa xe này không?")) {
+                try {
+                    // Gửi yêu cầu DELETE tới API backend
+                    const response = await fetch(`http://localhost:8080/cars/deletecar/${id}`, { method: "DELETE" });
+                    if (response.ok) {
+                        alert("Xe đã được xóa thành công!");
+                        fetchCars();  // Làm mới danh sách xe sau khi xóa
+                    } else {
+                        alert("Lỗi khi xóa xe");
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi gửi yêu cầu xóa:", error);
+                }
+            }
+        }
+
+        // Fetch danh sách xe khi trang được tải
+        fetchCars();
+    </script>
+</body>
+</html>

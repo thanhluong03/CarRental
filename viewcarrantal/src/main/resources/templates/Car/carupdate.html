@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Xe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        form { width: 50%; margin: 20px auto; }
+        label, input, button { display: block; margin: 10px; padding: 8px; width: 100%; }
+        img { max-width: 200px; max-height: 150px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Sửa Xe</h1>
+    <form id="editCarForm" enctype="multipart/form-data">
+        <input type="hidden" id="carId">
+        <label for="name">Tên Xe</label>
+        <input type="text" id="name" required>
+
+        <label for="brand">Hãng Xe</label>
+        <input type="text" id="brand" required>
+
+        <label for="model">Mẫu Xe</label>
+        <input type="text" id="model" required>
+
+        <label for="year">Năm Sản Xuất</label>
+        <input type="number" id="year" required>
+
+        <label for="licensePlate">Biển Số Xe</label>
+        <input type="text" id="licensePlate" required>
+
+        <label for="rentalPrice">Giá Thuê</label>
+        <input type="number" id="rentalPrice" required>
+
+        <label for="image">Ảnh Xe</label>
+        <input type="file" id="image">
+
+        <div>
+            <label>Ảnh Hiện Tại</label>
+            <img id="currentImage" alt="Ảnh xe hiện tại">
+        </div>
+
+        <div>
+            <label>Ảnh Đã Chọn</label>
+            <img id="previewImage" alt="Ảnh đã chọn" style="display: none;">
+        </div>
+
+        <button type="submit">Cập Nhật</button>
+    </form>
+
+    <script>
+        const apiUrl = "http://localhost:8080/cars/updatecar/";  // Đảm bảo URL đúng
+
+        // Get the car ID from the URL
+        const carId = new URLSearchParams(window.location.search).get('id');
+
+        // Fetch car details from backend and populate the form
+        async function fetchCar() {
+            try {
+                const response = await fetch(`${apiUrl}${carId}`);
+                if (!response.ok) throw new Error("Lỗi khi lấy thông tin xe");
+                const car = await response.json();
+
+                // Populate the form with car data
+                document.getElementById("carId").value = car.id;
+                document.getElementById("name").value = car.name;
+                document.getElementById("brand").value = car.brand;
+                document.getElementById("model").value = car.model;
+                document.getElementById("year").value = car.year;
+                document.getElementById("licensePlate").value = car.licensePlate;
+                document.getElementById("rentalPrice").value = car.rentalPrice;
+                
+                // Display current image
+                const currentImage = document.getElementById("currentImage");
+                if (car.image) {
+                    currentImage.src = `data:image/jpeg;base64,${car.image}`;
+                } else {
+                    currentImage.alt = "Không có ảnh";
+                }
+
+            } catch (error) {
+                console.error("Lỗi tải thông tin xe:", error);
+            }
+        }
+
+        // Handle form submission to update the car
+        document.getElementById("editCarForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const updatedCar = {
+                id: document.getElementById("carId").value,
+                name: document.getElementById("name").value,
+                brand: document.getElementById("brand").value,
+                model: document.getElementById("model").value,
+                year: document.getElementById("year").value,
+                licensePlate: document.getElementById("licensePlate").value,
+                rentalPrice: document.getElementById("rentalPrice").value
+            };
+
+            const formData = new FormData();
+
+            // Add car data to formData
+            formData.append("name", updatedCar.name);
+            formData.append("brand", updatedCar.brand);
+            formData.append("model", updatedCar.model);
+            formData.append("year", updatedCar.year);
+            formData.append("licensePlate", updatedCar.licensePlate);
+            formData.append("rentalPrice", updatedCar.rentalPrice);
+
+            const imageFile = document.getElementById("image").files[0];
+            if (imageFile) {
+                formData.append("image", imageFile);  // Append the new image if selected
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}${carId}`, {
+                    method: "PUT",
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("Cập nhật xe thành công!");
+                    window.location.href = "listcar";  // Redirect back to car list page
+                } else {
+                    alert("Lỗi khi cập nhật xe.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi gửi yêu cầu cập nhật:", error);
+            }
+        });
+
+        // Function to preview image when the user selects a file
+        document.getElementById("image").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            const previewImage = document.getElementById("previewImage");
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.style.display = "block";  // Show the preview image
+                    previewImage.src = e.target.result;  // Set the preview image source to the selected file
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.style.display = "none";  // Hide the preview image if no file is selected
+            }
+        });
+
+        // Fetch the car data when the page loads
+        fetchCar();
+    </script>
+</body>
+</html>
