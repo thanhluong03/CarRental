@@ -69,33 +69,27 @@ public class CarService {
     @Autowired
     private CarRepository carRepository;
 
-    // 📌 Lấy danh sách tất cả xe
     public List<Car> getAllCars() {
         return carRepository.findAll();
     }
 
-    // 📌 Lấy xe theo ID
+
     public Optional<Car> getCarById(Long id) {
         return carRepository.findById(id);
     }
 
-    // 📌 Thêm xe mới (bao gồm ảnh)
-    public Car addCar(Car car, byte[] image) {
-        car.setStatus(false); // Gán trạng thái xe là false
-        if (image != null) {
-            car.setImage(image); // Lưu ảnh vào xe
-        }
-        return carRepository.save(car); // Lưu xe vào cơ sở dữ liệu và trả về đối tượng đã lưu
+
+    public Car addCar(Car car) {
+        car.setStatus(false); 
+        return carRepository.save(car);
     }
     
 
-    // 📌 Cập nhật xe (bao gồm ảnh)
     public Car updateCar(Car car) {
-        return carRepository.save(car);  // Lưu xe (bao gồm ảnh nếu có) vào cơ sở dữ liệu
+        return carRepository.save(car);  
     }
     
 
-    // 📌 Xóa xe theo ID
     public boolean deleteCar(Long id) {
         if (carRepository.existsById(id)) {
             carRepository.deleteById(id);

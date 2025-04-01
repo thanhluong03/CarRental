@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Khách Hàng Thuê Xe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; }
+        img { 
+            width: 70px;   
+            height: 70px;  
+            object-fit: cover; 
+            border-radius: 5px; 
+        }
+        input, button { margin: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+
+    <h2>Danh Sách Khách Hàng Thuê Xe</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Họ tên</th>  
+                <th>Tuổi</th>
+                <th>Số điện thoại</th>
+                <th>Giới tính</th>
+                <th>CCCD</th> 
+                <th>Bằng lái xe</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="userList"></tbody>
+    </table>
+
+    <script>
+        const apiUrl = "http://localhost:8080/user/listuser";
+
+        async function fetchUsers() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Lỗi khi lấy danh sách khách hàng");
+                const users = await response.json();
+                const tableBody = document.getElementById("userList");
+                tableBody.innerHTML = "";
+                
+                users.forEach((user, index) => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${user.fullName}</td>
+                            <td>${user.age}</td>
+                            <td>${user.phoneNumber}</td>
+                            <td>${user.gender}</td>
+                            <td>${user.cccd}</td>
+                            <td><img src="data:image/jpeg;base64,${user.driverLicenseImage}" alt="Bằng lái xe"></td>
+                            <td>
+                                <button onclick="editUser(${user.id})">Sửa</button>
+                                <button onclick="deleteUser(${user.id})">Xóa</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu khách hàng:", error);
+            }
+        }
+
+        function editUser(id) {
+            window.location.href = `updateuser?id=${id}`;
+        }
+
+        async function deleteUser(id) {
+            if (confirm("Bạn có chắc chắn muốn xóa khách hàng này không?")) {
+                try {
+                    const response = await fetch(`http://localhost:8080/user/deleteuser/${id}`, { method: "DELETE" });
+                    if (response.ok) {
+                        alert("Khách hàng đã được xóa thành công!");
+                        fetchUsers();  
+                    } else {
+                        alert("Lỗi khi xóa khách hàng");
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi gửi yêu cầu xóa:", error);
+                }
+            }
+        }
+        
+        fetchUsers();
+    </script>
+</body>
+</html>

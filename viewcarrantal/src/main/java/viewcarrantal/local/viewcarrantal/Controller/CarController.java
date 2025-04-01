@@ -1,4 +1,4 @@
-package viewcarrantal.local.viewcarrantal;
+package viewcarrantal.local.viewcarrantal.Controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,5 +17,10 @@ public class CarController {
     @GetMapping("/updatecar")
     public String updatecar() {
         return "Car/carupdate";
+    }
+
+    @GetMapping("/home")
+    public String home() {
+        return "Home/home";
     }
 }

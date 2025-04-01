@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách xe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .car-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px;
+            justify-content: start; 
+            padding: 20px;
+        }
+        .car-card {
+            border: 1px solid black;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            background: #f9f9f9;
+        }
+        .car-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        button { margin-top: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h2>Danh Sách Xe</h2>
+    <div class="car-container" id="carList"></div>
+    <script>
+        const apiUrl = "http://localhost:8080/cars/listcar";
+        async function fetchCars() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Lỗi khi lấy danh sách xe");
+                const cars = await response.json();
+                const carContainer = document.getElementById("carList");
+                carContainer.innerHTML = "";
+                cars.forEach((car) => {
+                    carContainer.innerHTML += `
+                        <div class="car-card">
+                            <img src="data:image/jpeg;base64,${car.image}" alt="Ảnh xe">
+                            <h3>${car.name}</h3>
+                            <p>Hãng: ${car.brand}</p>
+                            <button onclick="bookCar(${car.id})">Đặt Xe</button>
+                        </div>`;
+                });
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu xe:", error);
+            }
+        }
+        function bookCar(id) { 
+            window.location.href = `rentalOrdercar?id=${id}`;
+         }
+        fetchCars();
+    </script>
+</body>
+</html>

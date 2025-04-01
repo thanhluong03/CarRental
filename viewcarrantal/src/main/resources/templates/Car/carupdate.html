@@ -50,19 +50,17 @@
     </form>
 
     <script>
-        const apiUrl = "http://localhost:8080/cars/updatecar/";  // Đảm bảo URL đúng
+        const apiUrl = "http://localhost:8080/cars/updatecar/";  
 
-        // Get the car ID from the URL
+
         const carId = new URLSearchParams(window.location.search).get('id');
 
-        // Fetch car details from backend and populate the form
         async function fetchCar() {
             try {
                 const response = await fetch(`${apiUrl}${carId}`);
                 if (!response.ok) throw new Error("Lỗi khi lấy thông tin xe");
                 const car = await response.json();
 
-                // Populate the form with car data
                 document.getElementById("carId").value = car.id;
                 document.getElementById("name").value = car.name;
                 document.getElementById("brand").value = car.brand;
@@ -71,7 +69,6 @@
                 document.getElementById("licensePlate").value = car.licensePlate;
                 document.getElementById("rentalPrice").value = car.rentalPrice;
                 
-                // Display current image
                 const currentImage = document.getElementById("currentImage");
                 if (car.image) {
                     currentImage.src = `data:image/jpeg;base64,${car.image}`;
@@ -84,7 +81,6 @@
             }
         }
 
-        // Handle form submission to update the car
         document.getElementById("editCarForm").addEventListener("submit", async (event) => {
             event.preventDefault();
 
@@ -100,7 +96,6 @@
 
             const formData = new FormData();
 
-            // Add car data to formData
             formData.append("name", updatedCar.name);
             formData.append("brand", updatedCar.brand);
             formData.append("model", updatedCar.model);
@@ -110,7 +105,7 @@
 
             const imageFile = document.getElementById("image").files[0];
             if (imageFile) {
-                formData.append("image", imageFile);  // Append the new image if selected
+                formData.append("image", imageFile);  
             }
 
             try {
@@ -121,7 +116,7 @@
 
                 if (response.ok) {
                     alert("Cập nhật xe thành công!");
-                    window.location.href = "listcar";  // Redirect back to car list page
+                    window.location.href = "listcar";  
                 } else {
                     alert("Lỗi khi cập nhật xe.");
                 }
@@ -130,7 +125,7 @@
             }
         });
 
-        // Function to preview image when the user selects a file
+    
         document.getElementById("image").addEventListener("change", function(event) {
             const file = event.target.files[0];
             const previewImage = document.getElementById("previewImage");
@@ -138,16 +133,16 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    previewImage.style.display = "block";  // Show the preview image
-                    previewImage.src = e.target.result;  // Set the preview image source to the selected file
+                    previewImage.style.display = "block";  
+                    previewImage.src = e.target.result;  
                 };
                 reader.readAsDataURL(file);
             } else {
-                previewImage.style.display = "none";  // Hide the preview image if no file is selected
+                previewImage.style.display = "none";  
             }
         });
 
-        // Fetch the car data when the page loads
+       
         fetchCar();
     </script>
 </body>

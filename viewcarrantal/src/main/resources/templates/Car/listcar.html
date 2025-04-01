@@ -9,16 +9,15 @@
         table { width: 80%; margin: 20px auto; border-collapse: collapse; }
         th, td { border: 1px solid black; padding: 10px; }
         img { 
-            width: 70px;   /* Đặt chiều rộng tối đa */
-            height: 70px;  /* Đặt chiều cao tối đa */
-            object-fit: cover; /* Giữ tỷ lệ ảnh đúng */
-            border-radius: 5px; /* Tạo bo tròn cho ảnh */
+            width: 70px;   
+            height: 70px;  
+            object-fit: cover; 
+            border-radius: 5px; 
         }
         input, button { margin: 10px; padding: 8px; }
     </style>
 </head>
 <body>
-    <h1>Quản Lý Xe</h1>
 
     <h2>Thêm Xe Mới</h2>
     <button onclick="goToAddCarPage()">Thêm Xe</button>
@@ -28,7 +27,7 @@
         <thead>
             <tr>
                 <th>STT</th>
-                <th>Ảnh</th>  <!-- Cột ảnh -->
+                <th>Ảnh</th>  
                 <th>Tên Xe</th>
                 <th>Hãng Xe</th>
                 <th>Hành động</th>
@@ -38,9 +37,7 @@
     </table>
 
     <script>
-        const apiUrl = "http://localhost:8080/cars/listcar";  // API lấy danh sách xe
-
-        // Hàm lấy và hiển thị danh sách xe
+        const apiUrl = "http://localhost:8080/cars/listcar";  
         async function fetchCars() {
             try {
                 const response = await fetch(apiUrl);
@@ -49,7 +46,6 @@
                 const tableBody = document.getElementById("carList");
                 tableBody.innerHTML = "";
                 
-                // Thêm số thứ tự tăng dần vào danh sách xe
                 cars.forEach((car, index) => {
                     tableBody.innerHTML += `
                         <tr>
@@ -68,25 +64,21 @@
             }
         }
 
-        // Hàm điều hướng đến trang thêm xe (add.html)
         function goToAddCarPage() {
-            window.location.href = "add";  // Giả sử bạn có trang 'add.html' cho việc thêm xe mới
+            window.location.href = "add"; i
         }
 
-        // Hàm sửa xe (redirect to edit page)
         function editCar(id) {
             window.location.href = `updatecar?id=${id}`;
         }
 
-        // Hàm xóa xe
         async function deleteCar(id) {
             if (confirm("Bạn có chắc chắn muốn xóa xe này không?")) {
                 try {
-                    // Gửi yêu cầu DELETE tới API backend
                     const response = await fetch(`http://localhost:8080/cars/deletecar/${id}`, { method: "DELETE" });
                     if (response.ok) {
                         alert("Xe đã được xóa thành công!");
-                        fetchCars();  // Làm mới danh sách xe sau khi xóa
+                        fetchCars();  
                     } else {
                         alert("Lỗi khi xóa xe");
                     }
@@ -96,7 +88,6 @@
             }
         }
 
-        // Fetch danh sách xe khi trang được tải
         fetchCars();
     </script>
 </body>

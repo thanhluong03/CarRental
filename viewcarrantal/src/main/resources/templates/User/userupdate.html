@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa thông tin khách hàng</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        form { width: 50%; margin: 20px auto; }
+        label, input, button { display: block; margin: 10px auto; padding: 8px; width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Sửa thông tin khách hàng</h1>
+    <form id="editUserForm">
+        <input type="hidden" id="userId">
+
+        <label for="fullName">Tên</label>
+        <input type="text" id="fullName" required>
+
+        <label for="age">Tuổi</label>
+        <input type="number" id="age" required>
+
+        <label for="phoneNumber">Số điện thoại</label>
+        <input type="text" id="phoneNumber" required>
+
+        <label for="gender">Giới tính</label>
+        <select id="gender" required>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+        </select>
+
+        <label for="cccd">CCCD</label>
+        <input type="text" id="cccd" required>
+
+        <button type="submit">Cập Nhật</button>
+    </form>
+
+    <script>
+        const apiUrl = "http://localhost:8080/user/";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const userId = new URLSearchParams(window.location.search).get('id');
+            if (userId) {
+                await fetchUser(userId);
+            }
+        });
+
+        async function fetchUser(userId) {
+            try {
+                const response = await fetch(`${apiUrl}updateuser/${userId}`);
+                if (!response.ok) throw new Error("Lỗi khi lấy thông tin người dùng");
+
+                const user = await response.json();
+                document.getElementById("userId").value = user.id;
+                document.getElementById("fullName").value = user.fullName;
+                document.getElementById("age").value = user.age;
+                document.getElementById("phoneNumber").value = user.phoneNumber;
+                document.getElementById("gender").value = user.gender;
+                document.getElementById("cccd").value = user.cccd;
+            } catch (error) {
+                alert("Không thể tải thông tin người dùng.");
+            }
+        }
+
+        document.getElementById("editUserForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const userId = document.getElementById("userId").value;
+            const updatedUser = {
+                fullName: document.getElementById("fullName").value,
+                age: parseInt(document.getElementById("age").value),
+                phoneNumber: document.getElementById("phoneNumber").value,
+                gender: document.getElementById("gender").value,
+                cccd: document.getElementById("cccd").value
+            };
+
+            try {
+                const response = await fetch(`${apiUrl}updateuser/${userId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedUser)
+                });
+
+                if (response.ok) {
+                    alert("Cập nhật thông tin thành công!");
+                    window.location.href = "listuser";
+                } else {
+                    throw new Error("Lỗi khi cập nhật người dùng");
+                }
+            } catch (error) {
+                alert("Không thể cập nhật thông tin.");
+            }
+        });
+    </script>
+</body>
+</html>
