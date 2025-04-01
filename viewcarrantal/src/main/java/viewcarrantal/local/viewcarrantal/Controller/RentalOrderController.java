@@ -7,6 +7,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class RentalOrderController {
     @GetMapping("/rentalOrdercar")
     public String rentalOrdercar() {
-        return "Home/rentalOrdercar";
+        return "RentalCar/rentalOrdercar";
+    }
+
+    @GetMapping("/listrentalorder")
+    public String listrentalorder() {
+        return "RentalCar/listRentalOrder";
+    }
+
+
+    @GetMapping("/updaterentalorder")
+    public String updaterentalorder() {
+        return "RentalCar/rentalorderupdate";
     }
 }

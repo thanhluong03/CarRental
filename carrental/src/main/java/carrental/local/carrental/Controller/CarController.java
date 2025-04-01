@@ -41,6 +41,7 @@ public class CarController {
     private RentalOrderService rentalOrderService;
 
     @ResponseBody
+
     @GetMapping("/listcar")
     @CrossOrigin(origins = "http://localhost:8888")
     public ResponseEntity<List<Car>> getAllCars() {
@@ -49,6 +50,17 @@ public class CarController {
             return ResponseEntity.ok(cars);
         } catch (Exception e) {
             logger.error("Lỗi khi lấy danh sách xe: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/homelistcar")
+    @CrossOrigin(origins = "http://localhost:8888")
+    public ResponseEntity<List<Car>> getAllCarsByStatus() {
+        try {
+            List<Car> cars = carService.getAllCarsByStatus(false);
+            return ResponseEntity.ok(cars);
+        } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }

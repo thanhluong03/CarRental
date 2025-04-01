@@ -30,6 +30,11 @@
                 <th>Ảnh</th>  
                 <th>Tên Xe</th>
                 <th>Hãng Xe</th>
+                <th>Model</th>
+                <th>Năm Sản Xuất</th>
+                <th>Biển Số</th>
+                <th>Giá Thuê</th>
+                <th>Trạng Thái</th>
                 <th>Hành động</th>
             </tr>
         </thead>
@@ -38,6 +43,7 @@
 
     <script>
         const apiUrl = "http://localhost:8080/cars/listcar";  
+
         async function fetchCars() {
             try {
                 const response = await fetch(apiUrl);
@@ -45,14 +51,23 @@
                 const cars = await response.json();
                 const tableBody = document.getElementById("carList");
                 tableBody.innerHTML = "";
-                
+
                 cars.forEach((car, index) => {
+                    // Kiểm tra trạng thái của xe để hiển thị đúng trạng thái
+                    const statusText = car.status ? "Đang được thuê" : "Chưa được thuê";
+                    const rentalPrice = car.rentalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
                     tableBody.innerHTML += `
                         <tr>
                             <td>${index + 1}</td> <!-- Hiển thị số thứ tự -->
-                            <td><img src="data:image/jpeg;base64,${car.image}" alt="Ảnh xe"></td>  <!-- Hiển thị ảnh xe -->
+                            <td><img src="data:image/jpeg;base64,${car.image}" alt="Ảnh xe"></td> <!-- Hiển thị ảnh xe -->
                             <td>${car.name}</td>
                             <td>${car.brand}</td>
+                            <td>${car.model}</td>
+                            <td>${car.year}</td>
+                            <td>${car.licensePlate}</td>
+                            <td>${rentalPrice}</td>  <!-- Hiển thị giá cho thuê -->
+                            <td>${statusText}</td>  <!-- Hiển thị trạng thái -->
                             <td>
                                 <button onclick="editCar(${car.id})">Sửa</button>
                                 <button onclick="deleteCar(${car.id})">Xóa</button>
@@ -65,7 +80,7 @@
         }
 
         function goToAddCarPage() {
-            window.location.href = "add"; i
+            window.location.href = "add";
         }
 
         function editCar(id) {

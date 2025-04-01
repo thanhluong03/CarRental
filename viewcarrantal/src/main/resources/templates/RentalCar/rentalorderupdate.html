@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Hóa Đơn Thuê Xe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        .form-container { width: 50%; margin: 30px auto; background-color: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <h2>Sửa Hóa Đơn Thuê Xe</h2>
+    
+    <div class="form-container">
+        <form id="editOrderForm">
+            <input type="text" id="customerName" placeholder="Tên khách hàng" disabled>
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <input type="number" id="price" placeholder="Tổng tiền">
+            <select id="status">
+                <option value="Chờ xác nhận">Chờ xác nhận</option>
+                <option value="Đã duyệt">Đã duyệt</option>
+                <option value="Đã hủy">Đã hủy</option>
+            </select>
+            <button type="button" onclick="updateOrder()">Cập nhật</button>
+        </form>
+    </div>
+
+    <script>
+        const apiUrl = "http://localhost:8080/rental/order/";
+        async function getOrderDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+
+            try {
+                const response = await fetch(apiUrl + orderId);
+                if (!response.ok) throw new Error("Không tìm thấy hóa đơn.");
+
+                const order = await response.json();
+                document.getElementById("customerName").value = order.user.fullName;
+                document.getElementById("startDate").value = order.startDate;
+                document.getElementById("endDate").value = order.endDate;
+                document.getElementById("price").value = order.totalPrice;
+                document.getElementById("status").value = order.status;
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Update the order details via PUT request
+        async function updateOrder() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+
+            const updatedOrder = {
+                startDate: document.getElementById("startDate").value,
+                endDate: document.getElementById("endDate").value,
+                totalPrice: parseFloat(document.getElementById("price").value),
+                status: document.getElementById("status").value
+            };
+
+            try {
+                const response = await fetch(`http://localhost:8080/rental/update/${orderId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedOrder)
+                });
+
+                if (response.ok) {
+                    alert("Hóa đơn đã được cập nhật thành công!");
+                    window.location.href = "listrentalorder";  
+                } else {
+                    alert("Lỗi khi cập nhật hóa đơn!");
+                }
+            } catch (error) {
+                console.error("Lỗi khi cập nhật hóa đơn:", error);
+            }
+        }
+
+        getOrderDetails();
+    </script>
+
+</body>
+</html>

@@ -73,17 +73,18 @@ public class CarService {
         return carRepository.findAll();
     }
 
-
+    public List<Car> getAllCarsByStatus(Boolean status) {
+        return carRepository.findByStatus(status);
+    }
     public Optional<Car> getCarById(Long id) {
         return carRepository.findById(id);
     }
 
 
     public Car addCar(Car car) {
-        car.setStatus(false); 
         return carRepository.save(car);
     }
-    
+
 
     public Car updateCar(Car car) {
         return carRepository.save(car);  

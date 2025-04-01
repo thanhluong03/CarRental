@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Hóa Đơn Thuê Xe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        table { width: 90%; margin: 20px auto; border-collapse: collapse; background: white; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        input, select { width: 100px; }
+        button { padding: 5px 10px; margin: 5px; cursor: pointer; }
+        .pending { color: orange; font-weight: bold; }
+        .approved { color: green; font-weight: bold; }
+        .cancelled { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>Danh Sách Hóa Đơn Thuê Xe</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Khách Hàng</th>
+                <th>Xe Thuê</th>
+                <th>Ngày Bắt Đầu</th>
+                <th>Ngày Kết Thúc</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody id="orderList"></tbody>
+    </table>
+
+    <script>
+        const apiUrl = "http://localhost:8080/rental/orders";  
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Lỗi khi lấy danh sách hóa đơn");
+                const orders = await response.json();
+                const tableBody = document.getElementById("orderList");
+                tableBody.innerHTML = "";
+                
+                orders.forEach((order, index) => {
+                    const statusClass = order.status === "Chờ xác nhận" ? "pending" 
+                                      : order.status === "Đã duyệt" ? "approved" 
+                                      : "cancelled";
+
+                    tableBody.innerHTML += `
+                        <tr id="row-${order.id}">
+                            <td>${index + 1}</td>
+                            <td>${order.user.fullName}</td>
+                            <td>${order.car.carName}</td>
+                            <td><input type="date" id="start-${order.id}" value="${order.startDate}" disabled></td>
+                            <td><input type="date" id="end-${order.id}" value="${order.endDate}" disabled></td>
+                            <td><input type="number" id="price-${order.id}" value="${order.totalPrice}" disabled></td>
+                            <td>
+                                <span class="${statusClass}">${order.status}</span>
+                            </td>
+                            <td>
+                                <button onclick="updateOrder(${order.id})">Sửa</button>
+                                <button onclick="deleteOrder(${order.id})" style="background-color: red; color: white;">Xóa</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu hóa đơn:", error);
+            }
+        }
+
+        async function updateOrder(orderId) {
+            window.location.href = `updaterentalorder?orderId=${orderId}`;
+        }
+
+        async function deleteOrder(orderId) {
+    if (!confirm("Bạn có chắc chắn muốn xóa hóa đơn này không?")) return;
+
+    try {
+        // Send DELETE request to remove the rental order and update car status in one go
+        const response = await fetch(`http://localhost:8080/rental/delete/${orderId}`, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+            alert("Hóa đơn đã được xóa");
+
+            document.getElementById(`row-${orderId}`).remove();
+        } else {
+            alert("Lỗi khi xóa hóa đơn!");
+        }
+    } catch (error) {
+        console.error("Lỗi khi xóa hóa đơn:", error);
+    }
+}
+
+
+        fetchOrders();
+    </script>
+
+</body>
+</html>
