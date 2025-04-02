@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .register-container {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .register-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .register-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .register-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .register-container button:hover {
+            background-color: #45a049;
+        }
+
+        .register-container a {
+            display: block;
+            margin-top: 10px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+
+        .register-container a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-container">
+    <h2>Đăng Ký</h2>
+    <form id="registerForm">
+        <input type="text" id="fullName" placeholder="Họ và tên" required>
+        <input type="number" id="age" placeholder="Tuổi" required>
+        <input type="text" id="phoneNumber" placeholder="Số điện thoại" required>
+        <input type="text" id="gender" placeholder="Giới tính" required>
+        <input type="text" id="cccd" placeholder="CCCD" required>
+        <input type="file" id="driverLicenseImage" required>
+        <input type="text" id="username" placeholder="Tài khoản" required>
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+        <button type="submit">Đăng Ký</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Tạo đối tượng FormData để lấy giá trị các trường
+        const formData = new FormData();
+        formData.append('fullName', document.getElementById('fullName').value);
+        formData.append('age', document.getElementById('age').value);
+        formData.append('phoneNumber', document.getElementById('phoneNumber').value);
+        formData.append('gender', document.getElementById('gender').value);
+        formData.append('cccd', document.getElementById('cccd').value);
+        formData.append('driverLicenseImage', document.getElementById('driverLicenseImage').files[0]);
+        formData.append('username', document.getElementById('username').value);
+        formData.append('password', document.getElementById('password').value);
+
+        // Gửi yêu cầu POST đến API backend
+        fetch('http://localhost:8080/user/createuser', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                alert("Đăng ký thành công!");
+                window.location.href = "login";  // Sau khi đăng ký thành công, chuyển hướng về trang đăng nhập
+            } else {
+                alert("Lỗi khi đăng ký.");
+            }
+        })
+        .catch(error => {
+            console.error('Có lỗi xảy ra:', error);
+            alert("Lỗi khi gửi yêu cầu đăng ký.");
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn xe mới </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .edit-container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .edit-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin: 10px 0;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .back-button, .save-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover, .save-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="edit-container">
+    <div id="invoiceDetails"></div>
+    <div class="form-group">
+        <h2 for="carSelect">Chọn xe mới</h2>
+        <select id="carSelect">
+            <!-- Xe sẽ được load vào đây -->
+        </select>
+    </div>
+
+    <button class="save-button" onclick="saveChanges()">Lưu Thay Đổi</button>
+    <button class="back-button" onclick="window.location.href='invoicePage.html';">Quay lại</button>
+</div>
+
+<script>
+    // Lấy ID hóa đơn từ localStorage
+    const invoiceId = localStorage.getItem('invoiceId');
+    if (!invoiceId) {
+        alert('Không tìm thấy hóa đơn để sửa.');
+        window.location.href = 'invoicePage.html';
+    }
+
+    // Lấy danh sách xe từ API
+    function loadCarOptions() {
+        fetch('http://localhost:8080/user/cars')
+            .then(response => {
+                if (!response.ok) {  // Kiểm tra mã trạng thái HTTP
+                    throw new Error('Không thể tải danh sách xe. Vui lòng thử lại sau.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const carSelect = document.getElementById('carSelect');
+                data.forEach(car => {
+                    const option = document.createElement('option');
+                    option.value = car.id;
+                    option.textContent = car.name;
+                    carSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy danh sách xe:', error);
+            });
+    }
+
+    // Lấy chi tiết hóa đơn và hiển thị
+    function getInvoiceDetails() {
+        fetch(`http://localhost:8080/user/invoice/${invoiceId}`)
+            .then(response => {
+                if (!response.ok) {  // Kiểm tra mã trạng thái HTTP
+                    throw new Error('Không thể lấy chi tiết hóa đơn. Vui lòng thử lại sau.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const invoiceDetails = document.getElementById('invoiceDetails');
+                invoiceDetails.innerHTML = `
+                    <p><strong>Xe Hiện Tại:</strong> ${data.car.name}</p>
+                    <p><strong>Ngày Bắt Đầu:</strong> ${data.startDate}</p>
+                    <p><strong>Ngày Kết Thúc:</strong> ${data.endDate}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy chi tiết hóa đơn:', error);
+            });
+    }
+
+    // Lưu thay đổi khi chọn xe mới
+    function saveChanges() {
+        const newCarId = document.getElementById('carSelect').value;
+        const updatedOrder = { car: { id: newCarId } };
+
+        fetch(`http://localhost:8080/user/updateInvoice/${invoiceId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedOrder)
+        })
+        .then(response => {
+            if (!response.ok) {  // Kiểm tra mã trạng thái HTTP
+                throw new Error('Không thể cập nhật hóa đơn. Vui lòng thử lại sau.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                alert('Cập nhật thành công!');
+                window.location.href = 'userrental';
+            } else {
+                console.log('Cập nhật không thành công, nhưng không hiển thị lỗi');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi cập nhật hóa đơn:', error);
+        });
+    }
+
+    // Gọi các hàm khi trang tải
+    window.onload = function() {
+        loadCarOptions(); // Load danh sách xe
+        getInvoiceDetails(); // Lấy chi tiết hóa đơn
+    };
+</script>
+
+</body>
+</html>

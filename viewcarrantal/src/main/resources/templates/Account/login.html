@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f4f7fa;
+        }
+
+        .login-container {
+            width: 300px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+
+        .login-container a {
+            display: block;
+            margin-top: 10px;
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-container a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .alert.success {
+            color: green;
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .login-footer a {
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Đăng Nhập</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Tài khoản" required>
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+        <button type="submit">Đăng Nhập</button>
+        <p id="loginError" class="alert"></p>
+    </form>
+    <!-- <div class="login-footer">
+        <a href="register">Chưa có tài khoản? Đăng ký ngay</a>
+    </div> -->
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Lấy giá trị từ form
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const loginError = document.getElementById('loginError');
+
+        // Xóa thông báo lỗi trước đó
+        loginError.textContent = '';
+
+        // Gửi yêu cầu đăng nhập tới API backend
+        fetch('http://localhost:8080/user/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data === 'Đăng nhập thành công!') {
+                // Nếu đăng nhập thành công, lưu username vào localStorage
+                localStorage.setItem('username', username);
+
+                // Chuyển hướng đến trang danh sách hóa đơn
+                window.location.href = "userrental";  // Điều chỉnh URL này theo yêu cầu
+            } else {
+                // Nếu đăng nhập không thành công
+                loginError.textContent = data;
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi gửi yêu cầu đăng nhập:', error);
+            loginError.textContent = 'Lỗi khi gửi yêu cầu đăng nhập.';
+        });
+    });
+</script>
+
+</body>
+</html>

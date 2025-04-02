@@ -42,6 +42,7 @@ public class CarController {
 
     @ResponseBody
 
+    
     @GetMapping("/listcar")
     @CrossOrigin(origins = "http://localhost:8888")
     public ResponseEntity<List<Car>> getAllCars() {

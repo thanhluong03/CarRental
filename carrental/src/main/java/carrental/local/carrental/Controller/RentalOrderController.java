@@ -77,49 +77,52 @@ public ResponseEntity<Car> getCarByIdCreat(@PathVariable Long id) {
     
 @PostMapping("/create")
 @CrossOrigin(origins = "http://localhost:8888")
-    public ResponseEntity<?> createRentalOrder(
-            @RequestParam("name") String fullName,
-            @RequestParam("age") int age,
-            @RequestParam("phone") String phoneNumber,
-            @RequestParam("gender") String gender,
-            @RequestParam("cccd") String cccd,
-            @RequestParam("startDate") String startDateStr,
-            @RequestParam("endDate") String endDateStr,
-            @RequestParam("totalPrice") double totalPrice,
-            @RequestParam("depositAmount") double depositAmount,
-            @RequestParam("drivingLicenseImage") MultipartFile drivingLicenseImage,
-            @RequestParam("carId") Long carId) {
+public ResponseEntity<?> createRentalOrder(
+        @RequestParam("name") String fullName,
+        @RequestParam("age") int age,
+        @RequestParam("phone") String phoneNumber,
+        @RequestParam("gender") String gender,
+        @RequestParam("cccd") String cccd,
+        @RequestParam("username") String username,       
+        @RequestParam("password") String password,       
+        @RequestParam("startDate") String startDateStr,
+        @RequestParam("endDate") String endDateStr,
+        @RequestParam("totalPrice") double totalPrice,
+        @RequestParam("depositAmount") double depositAmount,
+        @RequestParam("drivingLicenseImage") MultipartFile drivingLicenseImage,
+        @RequestParam("carId") Long carId) {
 
-        try {
-            Optional<Car> carOpt = carService.getCarById(carId);
-            if (carOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy xe.");
-            }
-
-            LocalDate startDate = LocalDate.parse(startDateStr);
-            LocalDate endDate = LocalDate.parse(endDateStr);
-            byte[] drivingLicenseImageBytes = drivingLicenseImage.getBytes();
-
-            Optional<User> existingUser = userService.findByCccd(cccd); 
-            User user;
-
-            if (existingUser.isPresent()) {
-                user = existingUser.get();
-            } else {
-                user = new User(fullName, age, phoneNumber, gender, cccd, drivingLicenseImageBytes);
-                user = userService.saveUser(user);
-            }
-
-            RentalOrder rentalOrder = new RentalOrder(user, carOpt.get(), startDate, endDate, totalPrice, depositAmount, "Chờ xác nhận");
-            rentalOrderService.saveRentalOrder(rentalOrder);
-
-            return ResponseEntity.ok("Đặt xe thành công!");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tải ảnh: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+    try {
+        Optional<Car> carOpt = carService.getCarById(carId);
+        if (carOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy xe.");
         }
+
+        LocalDate startDate = LocalDate.parse(startDateStr);
+        LocalDate endDate = LocalDate.parse(endDateStr);
+        byte[] drivingLicenseImageBytes = drivingLicenseImage.getBytes();
+
+        Optional<User> existingUser = userService.findByCccd(cccd); 
+        User user;
+
+
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+        } else {
+            user = new User(fullName, age, phoneNumber, gender, cccd, drivingLicenseImageBytes, username, password);
+            user = userService.saveUser(user);
+        }
+
+        RentalOrder rentalOrder = new RentalOrder(user, carOpt.get(), startDate, endDate, totalPrice, depositAmount, "Chờ xác nhận");
+        rentalOrderService.saveRentalOrder(rentalOrder);
+
+        return ResponseEntity.ok("Đặt xe thành công!");
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tải ảnh: " + e.getMessage());
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
     }
+}
 
     @PutMapping("/update/{id}")
     @CrossOrigin(origins = "http://localhost:8888")

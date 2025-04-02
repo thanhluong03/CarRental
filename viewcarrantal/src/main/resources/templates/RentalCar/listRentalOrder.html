@@ -55,7 +55,7 @@
                         <tr id="row-${order.id}">
                             <td>${index + 1}</td>
                             <td>${order.user.fullName}</td>
-                            <td>${order.car.carName}</td>
+                            <td>${order.car.name}</td>
                             <td><input type="date" id="start-${order.id}" value="${order.startDate}" disabled></td>
                             <td><input type="date" id="end-${order.id}" value="${order.endDate}" disabled></td>
                             <td><input type="number" id="price-${order.id}" value="${order.totalPrice}" disabled></td>
@@ -81,7 +81,7 @@
     if (!confirm("Bạn có chắc chắn muốn xóa hóa đơn này không?")) return;
 
     try {
-        // Send DELETE request to remove the rental order and update car status in one go
+
         const response = await fetch(`http://localhost:8080/rental/delete/${orderId}`, {
             method: "DELETE"
         });

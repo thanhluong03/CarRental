@@ -36,6 +36,12 @@
         <label for="cccd">Số CCCD:</label>
         <input type="text" id="cccd" name="cccd" required>
 
+        <label for="username">Tài Khoản:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Mật Khẩu:</label>
+        <input type="password" id="password" name="password" required>
+
         <label for="drivingLicenseImage">Ảnh Bằng Lái Xe:</label>
         <input type="file" id="drivingLicenseImage" name="drivingLicenseImage" accept="image/*" required>
 
@@ -73,7 +79,6 @@
                     const car = await response.json();
                     
                     if (response.ok && car) {
-                        console.log(car);  
                         document.getElementById("rentalPrice").value = car.rentalPrice; 
                     } else {
                         alert("Không tìm thấy thông tin xe.");

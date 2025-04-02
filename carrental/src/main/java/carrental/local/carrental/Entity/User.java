@@ -34,23 +34,31 @@ public class User {
 
     @Column(nullable = false, length = 20, unique = true)
     private String cccd;
-    
+
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] driverLicenseImage;
+
+    @Column(nullable = false, length = 50, unique = true)
+    private String username;  // Tài khoản người dùng
+
+    @Column(nullable = false, length = 100)  // Mật khẩu không mã hóa trong ví dụ này
+    private String password;  // Mật khẩu người dùng
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RentalOrder> rentals;
 
     public User() {}
 
-    public User(String fullName, int age, String phoneNumber, String gender, String cccd, byte[] driverLicenseImage) {
+    public User(String fullName, int age, String phoneNumber, String gender, String cccd, byte[] driverLicenseImage, String username, String password) {
         this.fullName = fullName;
         this.age = age;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
         this.cccd = cccd;
         this.driverLicenseImage = driverLicenseImage;
+        this.username = username;
+        this.password = password;
     }
 
     // Getters & Setters
@@ -74,4 +82,10 @@ public class User {
 
     public byte[] getDriverLicenseImage() { return driverLicenseImage; }
     public void setDriverLicenseImage(byte[] driverLicenseImage) { this.driverLicenseImage = driverLicenseImage; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }

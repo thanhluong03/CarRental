@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Hóa Đơn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .invoice-container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .invoice-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .invoice-item {
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            text-align: left;
+        }
+
+        .invoice-item p {
+            margin: 5px 0;
+        }
+
+        .invoice-item strong {
+            color: #4CAF50;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
+        .edit-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit-button:hover {
+            background-color: #0b7dda;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-container">
+    <h2>Danh Sách Hóa Đơn</h2>
+    <div id="invoiceList"></div>
+    <button class="back-button" onclick="window.location.href='login';">Quay lại Trang Đăng Nhập</button>
+</div>
+
+<script>
+    // Hàm lấy danh sách hóa đơn từ API và hiển thị
+    function fetchInvoices() {
+        const username = localStorage.getItem('username'); // Lấy tên người dùng từ localStorage
+
+        if (!username) {
+            alert("Bạn cần đăng nhập!");
+            window.location.href = "login";  // Nếu không có tên người dùng, chuyển về trang đăng nhập
+            return;
+        }
+
+        // Gửi yêu cầu lấy danh sách hóa đơn
+        fetch('http://localhost:8080/user/invoices?username=' + username)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const invoiceList = document.getElementById('invoiceList');
+                invoiceList.innerHTML = '';  // Xóa nội dung cũ
+
+                data.forEach(order => {
+                    const invoiceItem = document.createElement('div');
+                    invoiceItem.className = 'invoice-item';
+
+                    // So sánh ngày hiện tại với ngày kết thúc
+                    const currentDate = new Date();
+                    const endDate = new Date(order.endDate);
+
+                    // Kiểm tra nếu ngày hiện tại đã qua ngày kết thúc
+                    const isEditDisabled = currentDate > endDate;
+
+                    invoiceItem.innerHTML = 
+                        `<p><strong>Xe:</strong> ${order.car.name}</p>
+                        <p><strong>Ngày Bắt Đầu:</strong> ${order.startDate}</p>
+                        <p><strong>Ngày Kết Thúc:</strong> ${order.endDate}</p>
+                        <p><strong>Tổng Giá:</strong> ${order.totalPrice} VND</p>
+                        <p><strong>Trạng Thái:</strong> ${order.status}</p>
+                        <button class="edit-button ${isEditDisabled ? 'hidden' : ''}" onclick="editInvoice('${order.id}')">Sửa Xe</button>`;
+                    invoiceList.appendChild(invoiceItem);
+                });
+            } else {
+                document.getElementById('invoiceList').innerHTML = "<p>Không có hóa đơn nào.</p>";
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi lấy hóa đơn:', error);
+            alert('Có lỗi xảy ra khi tải danh sách hóa đơn.');
+        });
+    }
+
+    // Hàm sửa hóa đơn (đổi xe)
+    function editInvoice(invoiceId) {
+        // Lưu ID hóa đơn vào localStorage để sử dụng sau
+        localStorage.setItem('invoiceId', invoiceId);
+        
+        // Chuyển hướng đến trang chọn xe mới hoặc sửa hóa đơn
+        window.location.href = "userrentalupdate"; // Điều chỉnh trang theo yêu cầu
+    }
+
+    // Gọi hàm fetchInvoices khi trang tải xong
+    window.onload = fetchInvoices;
+</script>
+
+</body>
+</html>

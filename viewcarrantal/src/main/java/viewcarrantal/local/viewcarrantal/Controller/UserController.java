@@ -13,4 +13,12 @@ public class UserController {
     public String updateuser() {
         return "User/userupdate";
     }
+    @GetMapping("/userrental")
+    public String userrental() {
+        return "User/userrental";
+    }
+    @GetMapping("/userrentalupdate")
+    public String userrentalupdate() {
+        return "User/userrentalupdate";
+    }
 }

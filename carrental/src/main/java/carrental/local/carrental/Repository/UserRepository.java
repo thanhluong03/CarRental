@@ -8,4 +8,6 @@ import carrental.local.carrental.Entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByCccd(String cccd);
+
+    Optional<User> findByUsername(String username);
 }

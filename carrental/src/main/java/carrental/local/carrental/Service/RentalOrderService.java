@@ -38,4 +38,12 @@ public class RentalOrderService {
             throw new RuntimeException("Hóa đơn không tồn tại");  
         }
     }
+
+    public List<RentalOrder> findOrdersByUserUsername(String username) {
+        return rentalOrderRepository.findByUserUsername(username); 
+    }
+
+    public RentalOrder saveCarrental(RentalOrder order) {
+        return rentalOrderRepository.save(order);  
+    }
 }

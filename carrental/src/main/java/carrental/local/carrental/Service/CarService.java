@@ -73,6 +73,7 @@ public class CarService {
         return carRepository.findAll();
     }
 
+    
     public List<Car> getAllCarsByStatus(Boolean status) {
         return carRepository.findByStatus(status);
     }
